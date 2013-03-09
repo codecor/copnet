@@ -1,13 +1,3 @@
-
-if [ $# -eq 1 ]
-then
-	if [ $1 = "help" -o $1 = "man" ]
-	then
-		echo "=================="
-		echo "========== get net"
-		echo "=================="
-		echo "[ essid ] [ key ]"
-	fi
 fi
 connect_success=0
 while [ $connect_success -eq 0 ]; 

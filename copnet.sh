@@ -1,3 +1,13 @@
+
+if [ $# -eq 1 ]
+then
+	if [ $1 = "help" -o $1 = "man" ]
+	then
+		echo "==========================="
+		echo "=================== get net"
+		echo "==========================="
+		echo "[wep/wpa] [ essid ] [ key ]"
+	fi
 fi
 connect_success=0
 while [ $connect_success -eq 0 ]; 
@@ -10,30 +20,42 @@ do
   iwconfig wlan0 mode managed
 
   #office or home public
-  if [ $# -eq 2 ]; then
-	echo "connecting to public network"
-	echo "iwconfig wlan0 essid $1 key $2"
-	iwconfig wlan0 essid $1 key $2
-	connect_ok=1
-  elif [ $# -eq 1 ]; then
-	if [ "$1" == "cottage" ]; then
-		echo "welcome home"
-		echo "devices ready, prepare to connect..."
+  echo "1=$1"
+  if [ $# -gt 1 ]; then
+	if [ "$1" == "wep" ]; then
+	  echo "connecting to public wep network"
+	  echo "iwconfig wlan0 essid $2 key $3"
+	  iwconfig wlan0 essid $2 key $3
+	  connect_ok=1
+    fi
+	if [ "$1" == "wpa" ]; then
+        echo "connecting to public wpa network"
+        echo "wpa.conf file is $2"
 		ip link set wlan0 up
 		killall wpa_supplicant
 		sleep 1
-		wpa_supplicant -B Dwext -i wlan0 -c /etc/wpa_supplicant.conf
+		wpa_supplicant -B Dwext -i wlan0 -c $2
+		connect_ok=1
+    fi
+  elif [ $# -eq 1 ]; then
+	if [ "$1" == "somename" ]; then
+		echo "msg"
+		echo "moar msg"
+        ip link set wlan0 up
+		killall wpa_supplicant
+		sleep 1
+		wpa_supplicant -B Dwext -i wlan0 -c /etc/wpa_supplicant-wut.conf
 		connect_ok=1
 	fi
   else
-	# office
-	echo "start programming NOW"
-	iwconfig wlan0 essid Line key 0000000000
-	sleep 2 # trying to fix the first-attempt fail at the office
+	echo "msg"
+	iwconfig wlan0 essid apname key apkey
+	sleep 2 
 	connect_ok=1
   fi
 
   #connect
+  echo "connect=$connect_ok"
   if [ $connect_ok -eq 1 ]; then
 	dhcpcd wlan0
 	status=`echo $?`
